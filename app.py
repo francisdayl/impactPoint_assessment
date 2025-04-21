@@ -19,7 +19,8 @@ def create_app():
 
     # Register blueprints
     from routes.pokemon import pokemon_pb
+    from routes.api import api_pb
 
     app.register_blueprint(pokemon_pb, url_prefix="/pokemon")
-
+    app.register_blueprint(api_pb, url_prefix="/api")
     return app
