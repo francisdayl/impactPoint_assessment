@@ -23,15 +23,5 @@ class PokemonSchema(ma.SQLAlchemySchema):
     is_active = ma.auto_field()
 
 
-class StringListSchema(ma.Schema):
-    __schema__ = fields.List(fields.String(), required=True)
-
-    # Marshmallow expects a dict, so we override `load`
-    def load(self, data, *args, **kwargs):
-        return super().load({"__schema__": data}, *args, **kwargs)["__schema__"]
-
-
-string_list_schema = StringListSchema()
-
 pokemon_schema = PokemonSchema()
 pokemons_schema = PokemonSchema(many=True)

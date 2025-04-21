@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, Response
 import requests
 from models.pokemon import Pokemon
 from sqlalchemy.exc import SQLAlchemyError
-from schemas.pokemon import pokemon_schema, pokemons_schema, string_list_schema
+from schemas.pokemon import pokemon_schema, pokemons_schema
 from marshmallow import ValidationError
 from app import db
 import polars as pl
@@ -11,11 +11,13 @@ pokemon_pb = Blueprint("pokemon", __name__)
 
 
 @pokemon_pb.route("/create-by-name", methods=["POST"])
-def create_pokemons_by_names():
+def create_pokemon_by_name():
     pokemon_name = request.json.get("name")
     if not pokemon_name:
         return jsonify({"message": "Pokemon name is required"}), 400
-    existing_pokemon = Pokemon.query.filter_by(name=pokemon_name).first()
+    existing_pokemon = Pokemon.query.filter_by(
+        name=pokemon_name.lower().strip()
+    ).first()
     if existing_pokemon:
         return jsonify({"message": "Pokemon already exists"}), 400
     try:
@@ -77,10 +79,7 @@ def create_pokemon():
         db.session.commit()
         return (
             jsonify(
-                {
-                    "message": "Pokemon created successfully",
-                    "task": pokemon_schema.dump(pokemon_data),
-                }
+                pokemon_schema.dump(pokemon_data),
             ),
             201,
         )
@@ -97,7 +96,9 @@ def get_pokemon(pokemon_id):
 
 @pokemon_pb.route("/<string:pokemon_name>", methods=["GET"])
 def get_pokemon_by_name(pokemon_name):
-    pokemon = Pokemon.query.filter_by(name=pokemon_name).first()
+    if not pokemon_name:
+        return jsonify({"message": "Pokemon name is required"}), 400
+    pokemon = Pokemon.query.filter_by(name=pokemon_name.strip().lower()).first()
     if not pokemon:
         return jsonify({"message": "Pokemon not found"}), 404
     return jsonify(pokemon_schema.dump(pokemon)), 200

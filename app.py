@@ -1,10 +1,20 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_swagger_ui import get_swaggerui_blueprint
 from flask_marshmallow import Marshmallow
 
 db = SQLAlchemy()
 ma = Marshmallow()
+
+API_DEFINITION = "/static/openapi_definition.yml"
+SWAGGER_URL = "/api/docs"
+
+swagger_ui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_DEFINITION,
+    config={"app_name": "Poke Impact API"},
+)
 
 
 def create_app():
@@ -23,4 +33,5 @@ def create_app():
 
     app.register_blueprint(pokemon_pb, url_prefix="/pokemon")
     app.register_blueprint(api_pb, url_prefix="/api")
+    app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
     return app

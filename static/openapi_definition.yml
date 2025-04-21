@@ -1,0 +1,238 @@
+openapi: 3.0.4
+info:
+  title: Poke Impact
+  description: |-
+    API UI document with all the api endpoints definitions.
+  version: 1.0.12
+externalDocs:
+  description: Proyect Repository
+  url: https://swagger.io
+servers:
+  - url: http://localhost:5000
+tags:
+  - name: api
+    description: General requests to the api
+  - name: pokemon
+    description: Operations about pokemons
+paths:
+## API ENDPOINTS
+  /api/health:
+    get:
+      tags:
+        - api
+      summary: Health check.
+      description: Check the health of the server.
+      operationId: health_check
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: 'ok'
+        '500':
+          description: Internal server Error
+
+## POKEMON ENDPOINTS
+  /pokemon/{pokemonId}:
+    get:
+      tags:
+        - pokemon
+      summary: Get pokemon by id.
+      description: Get pokemon by id.
+      operationId: get_pokemon
+      parameters:
+        - name: pokemonId
+          in: path
+          description: The pokemon id
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pokemon'
+        '400':
+          description: Invalid pokemon id supplied
+        '404':
+          description: Pokemon not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /pokemon/{pokemonName}:
+    get:
+      tags:
+        - pokemon
+      summary: Get pokemon by name.
+      description: Get pokemon name.
+      operationId: get_pokemon_by_name
+      parameters:
+        - name: pokemonName
+          in: path
+          description: The pokemon name
+          required: true
+          schema:
+            type: string
+            example: pikachu
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pokemon'
+        '400':
+          description: Invalid pokemon name supplied
+        '404':
+          description: Pokemon not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /pokemon/report:
+    get:
+      tags:
+        - pokemon
+      summary: Download a report of all pokemons.
+      description: Responds with a csv of all the existing pokemons in the database.
+      operationId: pokemon_report
+      responses:
+        '200':
+          description: successful operation
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+              example: |
+                id,name,height,weight,base_experience,location_area_encounters,created_at,is_active
+                1,pikachu,4.0,60.0,112,https://pokeapi.co/api/v2/pokemon/25/encounters,2025-04-21T16:50:57,true
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+              description: Attachment header with filename
+              example: 'attachment; filename="pokemons_data.csv"'
+            
+        '500':
+          description: Internal server Error
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /pokemon/create-by-name:
+    post:
+      tags:
+        - pokemon
+      summary: Create a pokemon using the name.
+      description: Fetches the pokemen data from the poke api and creates a pokemon and returns it.
+      operationId: create_pokemon_by_name
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Pikachu
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pokemon'
+        '400':
+          description: Pokemon already exists
+        '404':
+          description: Pokemon not found
+        '500':
+          description: Internal server Error
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /pokemon/create:
+    post:
+      tags:
+        - pokemon
+      summary: Create a pokemon.
+      description: Creates a pokemon.
+      operationId: create_pokemon
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pokemon'
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pokemon'
+        '400':
+          description: Pokemon already exists
+        '404':
+          description: Pokemon not found
+        '500':
+          description: Internal server Error
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    Pokemon:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Pikachu
+        height:
+          type: integer
+          example: 0.4
+        weight:
+          type: integer
+          example: 6
+        base_experience:
+          type: integer
+          example: 112
+        location_area_encounters:
+          type: string
+          example: 'https://pokeapi.co/api/v2/pokemon/1/encounters'
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+  
