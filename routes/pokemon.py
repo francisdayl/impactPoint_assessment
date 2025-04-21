@@ -7,10 +7,10 @@ from marshmallow import ValidationError
 from app import db
 import polars as pl
 
-pokemon_pb = Blueprint("pokemon", __name__)
+pokemon_bp = Blueprint("pokemon", __name__)
 
 
-@pokemon_pb.route("/create-by-name", methods=["POST"])
+@pokemon_bp.route("/create-by-name", methods=["POST"])
 def create_pokemon_by_name():
     pokemon_name = request.json.get("name")
     if not pokemon_name:
@@ -56,7 +56,7 @@ def create_pokemon_by_name():
         return jsonify({"message": "Database error", "error": str(e)}), 500
 
 
-@pokemon_pb.route("/create", methods=["POST"])
+@pokemon_bp.route("/create", methods=["POST"])
 def create_pokemon():
     try:
         pokemon_data = pokemon_schema.load(request.json)
@@ -83,7 +83,7 @@ def create_pokemon():
         return jsonify({"message": "Database error", "error": str(e)}), 500
 
 
-@pokemon_pb.route("/all", methods=["GET"])
+@pokemon_bp.route("/all", methods=["GET"])
 def get_all_pokemons():
     pokemons = Pokemon.query.all()
     if not pokemons:
@@ -91,13 +91,13 @@ def get_all_pokemons():
     return jsonify(pokemons_schema.dump(pokemons)), 200
 
 
-@pokemon_pb.route("/<int:pokemon_id>", methods=["GET"])
+@pokemon_bp.route("/<int:pokemon_id>", methods=["GET"])
 def get_pokemon(pokemon_id):
     pokemon = Pokemon.query.first_or_404(pokemon_id)
     return jsonify(pokemon_schema.dump(pokemon)), 200
 
 
-@pokemon_pb.route("/<string:pokemon_name>", methods=["GET"])
+@pokemon_bp.route("/<string:pokemon_name>", methods=["GET"])
 def get_pokemon_by_name(pokemon_name):
     if not pokemon_name:
         return jsonify({"message": "Pokemon name is required"}), 400
@@ -107,7 +107,7 @@ def get_pokemon_by_name(pokemon_name):
     return jsonify(pokemon_schema.dump(pokemon)), 200
 
 
-@pokemon_pb.route("/report", methods=["GET"])
+@pokemon_bp.route("/report", methods=["GET"])
 def pokemon_report():
     pokemons = pokemons_schema.dump(Pokemon.query.all())
     df = pl.DataFrame(pokemons)

@@ -31,10 +31,10 @@ def create_app(testing=False):
     migrate.init_app(app, db)
 
     # Register blueprints
-    from routes.pokemon import pokemon_pb
+    from routes.pokemon import pokemon_bp
     from routes.api import api_pb
 
-    app.register_blueprint(pokemon_pb, url_prefix="/pokemon")
+    app.register_blueprint(pokemon_bp, url_prefix="/pokemon")
     app.register_blueprint(api_pb, url_prefix="/api")
     app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
     return app
