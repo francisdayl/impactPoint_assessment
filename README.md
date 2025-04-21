@@ -52,4 +52,12 @@ docker run -d -p 5000:5000 --name pokemon-scout pokemon-scout
 Visit: http://localhost:5000/api/docs/
 
 
-# For testing
+# For Testing
+Normal testing
+```
+pytest
+```
+Verbose testing
+```
+pytest -s
+```

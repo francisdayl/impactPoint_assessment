@@ -38,6 +38,30 @@ paths:
           description: Internal server Error
 
 ## POKEMON ENDPOINTS
+  /pokemon/all:
+    get:
+      tags:
+        - pokemon
+      summary: Get all the pokemons.
+      description: Retrieves a list with all the registered pokemons.
+      operationId: get_all_pokemons
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pokemon'
+        '404':
+          description: Pokemons not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /pokemon/{pokemonId}:
     get:
       tags:

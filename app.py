@@ -17,9 +17,12 @@ swagger_ui_blueprint = get_swaggerui_blueprint(
 )
 
 
-def create_app():
+def create_app(testing=False):
     app = Flask(__name__)
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///./poke_DB.db"
+    if testing:
+        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    else:
+        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///./poke_DB.db"
 
     db.init_app(app)
     ma.init_app(app)

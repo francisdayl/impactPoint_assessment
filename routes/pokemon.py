@@ -48,12 +48,7 @@ def create_pokemon_by_name():
         db.session.add(pokemon)
         db.session.commit()
         return (
-            jsonify(
-                {
-                    "message": "Pokemon created successfully",
-                    "task": pokemon_schema.dump(pokemon),
-                }
-            ),
+            jsonify(pokemon_schema.dump(pokemon)),
             201,
         )
     except SQLAlchemyError as e:
@@ -88,9 +83,17 @@ def create_pokemon():
         return jsonify({"message": "Database error", "error": str(e)}), 500
 
 
+@pokemon_pb.route("/all", methods=["GET"])
+def get_all_pokemons():
+    pokemons = Pokemon.query.all()
+    if not pokemons:
+        return jsonify({"message": "No pokemons found"}), 404
+    return jsonify(pokemons_schema.dump(pokemons)), 200
+
+
 @pokemon_pb.route("/<int:pokemon_id>", methods=["GET"])
 def get_pokemon(pokemon_id):
-    pokemon = Pokemon.query.get_or_404(pokemon_id)
+    pokemon = Pokemon.query.first_or_404(pokemon_id)
     return jsonify(pokemon_schema.dump(pokemon)), 200
 
 
