@@ -3,7 +3,7 @@ Technical assessment for Impact Point.
 Pokémon Scouting Data Implementation.
 ## Description
 Rest API with pokemon operations to showcase backend skills.
-## Proyect Spefications
+## Project Spefications
 Check the requirements.txt <br>
 **Python Version** 3.11 <br>
 **Sqlite** For database <br>
